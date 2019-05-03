@@ -17,6 +17,13 @@ Node *new_node_num(int val) {
   return node;
 }
 
+Node *new_node_ident(char name) {
+  Node *node = malloc(sizeof(Node));
+  node->ty = ND_IDENT;
+  node->name = name;
+  return node;
+}
+
 int consume(int ty) {
   if (tokens[pos].ty != ty)
     return 0;
@@ -49,7 +56,7 @@ Node *relational() {
 Node *term() {
   // 次のトークンが'('なら、"(" equality ")"のはず
   if (consume('(')) {
-    Node *node = equality();
+    Node *node = assign();
     if (!consume(')'))
       error("開きカッコに対応する閉じカッコがありません: %s",
             tokens[pos].input);
@@ -59,6 +66,9 @@ Node *term() {
   // そうでなければ数値のはず
   if (tokens[pos].ty == TK_NUM)
     return new_node_num(tokens[pos++].val);
+
+  if (tokens[pos].ty == TK_IDENT)
+    return new_node_ident(tokens[pos++].val);
 
   error("数値でも開きカッコでもないトークンです: %s",
         tokens[pos].input);
@@ -98,12 +108,42 @@ Node *add() {
   }
 }
 
+Node *assign() {
+  Node *node = equality();
+
+  while(consume('='))
+    node = new_node('=', node, assign());
+  return node;
+}
+
+Node *stmt() {
+  Node *node = assign();
+  if (!consume(';'))
+    error("';'ではないトークンです: %s", tokens[pos].input);
+  return node;
+}
+
+void program() {
+  int i = 0;
+  while (tokens[pos].ty != TK_EOF)
+    code[i++] = stmt();
+  code[i] = NULL;
+}
+
 // pが指している文字列をトークンに分割してtokensに保存する
 void tokenize(char *p) {
   int i = 0;
   while (*p) {
     // 空白文字をスキップ
     if (isspace(*p)) {
+      p++;
+      continue;
+    }
+
+    if ('a' <= *p && *p <= 'z') {
+      tokens[i].ty = TK_IDENT;
+      tokens[i].input = p;
+      i++;
       p++;
       continue;
     }
@@ -134,7 +174,7 @@ void tokenize(char *p) {
       continue;
     }
 
-    if (strchr("+-*/<>()", *p)) {
+    if (strchr("+-*/<>()=;", *p)) {
       tokens[i].ty = *p;
       tokens[i].input = p;
       i++;
