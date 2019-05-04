@@ -1,6 +1,9 @@
 #include "9cc.h"
 
 int pos = 0;
+int ident_num = 0;
+
+Map *ident_map;
 
 int is_alnum(char c) {
   return ('a' <= c && c <= 'z') ||
@@ -24,7 +27,7 @@ Node *new_node_num(int val) {
   return node;
 }
 
-Node *new_node_ident(char name) {
+Node *new_node_ident(char *name) {
   Node *node = malloc(sizeof(Node));
   node->ty = ND_IDENT;
   node->name = name;
@@ -150,6 +153,7 @@ void program() {
 // pが指している文字列をトークンに分割してtokensに保存する
 void tokenize(char *p) {
   int i = 0;
+  ident_map = new_map();
   while (*p) {
     // 空白文字をスキップ
     if (isspace(*p)) {
@@ -166,11 +170,16 @@ void tokenize(char *p) {
     }
 
     if ('a' <= *p && *p <= 'z') {
+      int char_i = 0;
       tokens[i].ty = TK_IDENT;
-      tokens[i].name = *p;
+      while (is_alnum(*(p + char_i)))
+        char_i++;
+      tokens[i].name = strndup(p, char_i);
       tokens[i].input = p;
+      map_put(ident_map, tokens[i].name, (void *)ident_num);
       i++;
-      p++;
+      p += char_i;
+      ident_num++;
       continue;
     }
 

@@ -50,5 +50,6 @@ try 10 'a = 4;b = 10;'
 
 try 10 'return 10;'
 try 14 'a = 4; b = 10; return a + b;'
+try 14 'count = 4; offset = 10; return count + offset;'
 
 echo OK

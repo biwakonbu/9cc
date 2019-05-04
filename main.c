@@ -1,5 +1,7 @@
 #include "9cc.h"
 
+extern int ident_num;
+
 int main (int argc, char **argv) {
   if (argc != 2) {
     fprintf(stderr, "引数の個数が正しくありません\n");
@@ -24,7 +26,7 @@ int main (int argc, char **argv) {
   // 変数26個分の領域を確保する
   printf("  push rbp\n");
   printf("  mov rbp, rsp\n");
-  printf("  sub rsp, 208\n");
+  printf("  sub rsp, %d\n", (ident_num * 8));
 
 
   // 先頭の式から順にコード生成
