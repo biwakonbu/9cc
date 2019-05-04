@@ -48,4 +48,7 @@ try 0 '4 != 4;'
 try 4 'a = 4;'
 try 10 'a = 4;b = 10;'
 
+try 10 'return 10;'
+try 14 'a = 4; b = 10; return a + b;'
+
 echo OK

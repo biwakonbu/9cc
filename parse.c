@@ -2,6 +2,13 @@
 
 int pos = 0;
 
+int is_alnum(char c) {
+  return ('a' <= c && c <= 'z') ||
+    ('A' <= c && c <= 'Z') ||
+    ('0' <= c && c <= '9') ||
+    (c == '_');
+}
+
 Node *new_node(int ty, Node *lhs, Node *rhs) {
   Node *node = malloc(sizeof(Node));
   node->ty = ty;
@@ -68,7 +75,7 @@ Node *term() {
     return new_node_num(tokens[pos++].val);
 
   if (tokens[pos].ty == TK_IDENT)
-    return new_node_ident(tokens[pos++].val);
+    return new_node_ident(tokens[pos++].name);
 
   error("数値でも開きカッコでもないトークンです: %s",
         tokens[pos].input);
@@ -117,7 +124,16 @@ Node *assign() {
 }
 
 Node *stmt() {
-  Node *node = assign();
+  Node *node;
+
+  if (consume(TK_RETURN)) {
+    node = malloc(sizeof(Node));
+    node->ty = ND_RETURN;
+    node->lhs = assign();
+  } else {
+    node = assign();
+  }
+
   if (!consume(';'))
     error("';'ではないトークンです: %s", tokens[pos].input);
   return node;
@@ -140,8 +156,17 @@ void tokenize(char *p) {
       continue;
     }
 
+    if (strncmp(p, "return", 6) == 0 && !is_alnum(p[6])) {
+      tokens[i].ty = TK_RETURN;
+      tokens[i].input = p;
+      i++;
+      p += 6;
+      continue;
+    }
+
     if ('a' <= *p && *p <= 'z') {
       tokens[i].ty = TK_IDENT;
+      tokens[i].name = *p;
       tokens[i].input = p;
       i++;
       p++;

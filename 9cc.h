@@ -22,6 +22,7 @@ void runtest();
 enum {
   TK_NUM = 256, // 整数トークン
   TK_IDENT, // 識別子
+  TK_RETURN, // return
   TK_EQ, // ==
   TK_NE, // !=
   TK_LE, // <=
@@ -33,6 +34,7 @@ enum {
 typedef struct {
   int ty; // トークンの型
   int val; // tyがTK_NUMの場合、その数値
+  char name; // tyがTK_IDENTの場合、その名前
   char *input; // トークン文字列 (エラーメッセージ用)
 } Token;
 
@@ -43,6 +45,7 @@ Token tokens[100];
 enum {
   ND_NUM = 256, // 整数のノードの型
   ND_IDENT, // 識別子のノードの型
+  ND_RETURN, // return
 };
 
 typedef struct Node {
