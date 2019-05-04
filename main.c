@@ -8,7 +8,6 @@ int main (int argc, char **argv) {
 
   if (strcmp(argv[1], "-test") == 0) {
     runtest();
-    test_map();
     return 0;
   }
   // トークナイズしてパースする
