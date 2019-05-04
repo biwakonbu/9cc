@@ -79,6 +79,7 @@ Node *term() {
 
   error("数値でも開きカッコでもないトークンです: %s",
         tokens[pos].input);
+  return NULL;
 }
 
 Node *unary() {

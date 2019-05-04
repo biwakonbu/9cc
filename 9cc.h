@@ -17,6 +17,7 @@ void vec_push(Vector *vec, void *elem);
 // test
 void expect(int line, int expected, int actual);
 void runtest();
+void test_map();
 
 // トークンの型を表す値
 enum {
@@ -71,3 +72,8 @@ void tokenize(char *p);
 void error(char *fmt, ...);
 
 void gen(Node *node);
+
+typedef struct {
+  Vector *keys;
+  Vector *vals;
+} Map;
